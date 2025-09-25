@@ -1,10 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class EnemyManager : SingletonMono<EnemyManager>
 {
     [SerializeField] private Enemy _enemyPrefab;
     [SerializeField] private Transform _root; // 적들을 담을 부모(없으면 자동 생성)
+
+    [Header("Enemy Auto-Spawn")]
+    [SerializeField, Min(0.05f)] private float _spawnInterval = 0.5f;
+
+    private Coroutine _spawnRoutine;
 
     private readonly List<Enemy> _activeEnemies = new();
 
@@ -79,6 +85,43 @@ public class EnemyManager : SingletonMono<EnemyManager>
         {
             for (int i = _root.childCount - 1; i >= 0; i--)
                 Destroy(_root.GetChild(i).gameObject);
+        }
+    }
+
+
+    public void StartEnemySpawn()
+    {
+        if (_spawnRoutine != null) return;
+        _spawnRoutine = StartCoroutine(SpawnLoop());
+    }
+
+    public void StopEnemySpawn()
+    {
+        if (_spawnRoutine == null) return;
+        StopCoroutine(_spawnRoutine);
+        _spawnRoutine = null;
+    }
+
+    private IEnumerator SpawnLoop()
+    {
+        // 전장/경로 준비될 때까지 대기
+        while (true)
+        {
+            var bf = FieldManager.Instance?.CurrentField as BattleField;
+            if (bf != null && bf.Path != null)
+            {
+                var path = bf.Path.GetPath();
+                if (path != null && path.Count > 1) break;
+            }
+            yield return null;
+        }
+
+        var wait = new WaitForSeconds(_spawnInterval);
+        while (true)
+        {
+            SpawnEnemy();
+
+            yield return wait;
         }
     }
 }
