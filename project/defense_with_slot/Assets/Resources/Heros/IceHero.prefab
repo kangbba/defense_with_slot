@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 515884071051673511}
   - component: {fileID: 4159938718380067841}
   - component: {fileID: 8961120259369085679}
+  - component: {fileID: 2989595895276249668}
   m_Layer: 0
   m_Name: IceHero
   m_TagString: Untagged
@@ -106,8 +107,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5077a3ffac7d43f3a38dae8db39beeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderer: {fileID: 7106834007011169587}
   _level: 1
+--- !u!114 &2989595895276249668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845362923257243726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a800d14c244be4216a3fc41afa3510fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackInterval: 1
+  attackRange: 5
+  targetingMode: 1
+  iceProjectilePrefab: {fileID: 3180124450025084305, guid: b6371bf5d932a439998816ebac3c2262, type: 3}
+  projectileSpeed: 12
+  projectileLifeTime: 3
+  damage: 8
+  penetration: 3
+  slowDuration: 2
+  slowFactor: 0.5
 --- !u!1 &2731794226015983847
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 515884071051673511}
   - component: {fileID: 4159938718380067841}
   - component: {fileID: 1724060579817232280}
+  - component: {fileID: 32063837288630610}
   m_Layer: 0
   m_Name: PoisonHero
   m_TagString: Untagged
@@ -106,8 +107,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b85216f773144579876e230da32cece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderer: {fileID: 7106834007011169587}
   _level: 1
+--- !u!114 &32063837288630610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845362923257243726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f37243ba7c304013bf7c62b22389dc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackInterval: 5
+  attackRange: 5
+  targetingMode: 2
+  impactDamage: 5
+  poisonRadius: 2
+  poisonDuration: 8
+  poisonTickDamage: 1
+  poisonTickInterval: 0.01
+  travelTime: 1
+  projectilePrefab: {fileID: 3180124450025084305, guid: b6371bf5d932a439998816ebac3c2262, type: 3}
+  poisonColor: {r: 0.6, g: 0.1, b: 0.7, a: 0.8352941}
+  effectScale: 2
 --- !u!1 &2731794226015983847
 GameObject:
   m_ObjectHideFlags: 0

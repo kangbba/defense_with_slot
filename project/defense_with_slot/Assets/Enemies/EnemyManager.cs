@@ -5,6 +5,8 @@ using System.Collections;
 public class EnemyManager : SingletonMono<EnemyManager>
 {
     [SerializeField] private Enemy _enemyPrefab;
+    [SerializeField] private HpBar _hpBarPrefab; // UI Prefab (World Canvas에 붙는)
+    [SerializeField] private Transform _uiRoot; // WorldCanvas 밑에 둘 루트
     [SerializeField] private Transform _root; // 적들을 담을 부모(없으면 자동 생성)
 
     [Header("Enemy Auto-Spawn")]
@@ -15,6 +17,8 @@ public class EnemyManager : SingletonMono<EnemyManager>
     private readonly List<Enemy> _activeEnemies = new();
 
     protected override bool UseDontDestroyOnLoad => false;
+
+    public List<Enemy> ActiveEnemies => _activeEnemies;
 
     protected override void Release()
     {
@@ -68,6 +72,9 @@ public class EnemyManager : SingletonMono<EnemyManager>
 
         // Enemy 초기화 (경로 전달: 복사본)
         enemy.Init(new List<Vector2>(pathReadonly), onDie: () => _activeEnemies.Remove(enemy));
+
+        var hpBar = Instantiate(_hpBarPrefab, _uiRoot);
+        hpBar.Bind(enemy);
 
         _activeEnemies.Add(enemy);
     }

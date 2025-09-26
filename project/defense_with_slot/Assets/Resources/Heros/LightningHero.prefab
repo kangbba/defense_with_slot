@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 515884071051673511}
   - component: {fileID: 4159938718380067841}
   - component: {fileID: 6266582563780608163}
+  - component: {fileID: 8791096631486651943}
   m_Layer: 0
   m_Name: LightningHero
   m_TagString: Untagged
@@ -106,8 +107,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f661c8f2e49545d39395765bd5d5b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderer: {fileID: 7106834007011169587}
   _level: 1
+--- !u!114 &8791096631486651943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845362923257243726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a76112c8cc58433b827e51704f71060, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackInterval: 1
+  attackRange: 10
+  targetingMode: 2
+  damage: 100
+  strikeRadius: 2
+  chargeTime: 3
+  lightningColor: {r: 0.048089504, g: 1, b: 0, a: 1}
+  effectScale: 2
 --- !u!1 &2731794226015983847
 GameObject:
   m_ObjectHideFlags: 0

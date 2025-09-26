@@ -1,13 +1,11 @@
 using UnityEngine;
 using DG.Tweening;
 using UniRx;
+
+[RequireComponent(typeof(LightningHeroCombat))] // 🔹 LightningHeroCombat 반드시 필요
 public class LightningHero : Hero
 {
     public override HeroType Type => HeroType.Lightning;
-    public override void Attack()
-    {
-        Debug.Log("⚡ LightningHero: 단일 강력 공격!");
-    }
 
     protected override void OnLevelUp()
     {

@@ -2,14 +2,10 @@ using UnityEngine;
 using DG.Tweening;
 using UniRx;
 
+[RequireComponent(typeof(FireHeroCombat))] // 🔹 FireHeroCombat 반드시 필요
 public class FireHero : Hero
 {
     public override HeroType Type => HeroType.Fire;
-
-    public override void Attack()
-    {
-        Debug.Log("🔥 FireHero: 범위 폭발 공격!");
-    }
 
     protected override void OnLevelUp()
     {

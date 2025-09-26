@@ -1,14 +1,11 @@
 using UnityEngine;
 using DG.Tweening;
 using UniRx;
+
+[RequireComponent(typeof(IceHeroCombat))] // 🔹 IceHeroCombat 반드시 필요
 public class IceHero : Hero
 {
     public override HeroType Type => HeroType.Ice;
-
-    public override void Attack()
-    {
-        Debug.Log("❄️ IceHero: 관통 공격!");
-    }
 
     protected override void OnLevelUp()
     {

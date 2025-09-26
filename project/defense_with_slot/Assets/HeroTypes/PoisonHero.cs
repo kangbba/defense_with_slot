@@ -1,14 +1,11 @@
 using UnityEngine;
 using DG.Tweening;
 using UniRx;
+
+[RequireComponent(typeof(PoisonHeroCombat))] // 🔹 PoisonHeroCombat 반드시 필요
 public class PoisonHero : Hero
 {
     public override HeroType Type => HeroType.Poison;
-
-    public override void Attack()
-    {
-        Debug.Log("☠️ PoisonHero: 범위 중독 공격!");
-    }
 
     protected override void OnLevelUp()
     {

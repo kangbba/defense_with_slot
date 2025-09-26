@@ -1,14 +1,11 @@
 using UnityEngine;
 using DG.Tweening;
 using UniRx;
+
+[RequireComponent(typeof(RockHeroCombat))] // 🔹 RockHeroCombat 반드시 필요
 public class RockHero : Hero
 {
     public override HeroType Type => HeroType.Rock;
-
-    public override void Attack()
-    {
-        Debug.Log("🪨 RockHero: 빠른 공격!");
-    }
 
     protected override void OnLevelUp()
     {

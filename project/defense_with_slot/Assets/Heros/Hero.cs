@@ -72,6 +72,11 @@ public abstract class Hero : MonoBehaviour
             .WithLatestFrom(_draggable.CurrentWorldPos, (_, pos) => pos)
             .Subscribe(pos => _onDragEnd?.Invoke(this, pos))
             .AddTo(this);
+
+        // ✅ 전투 루프 시작
+        var combat = GetComponent<HeroCombat>();
+        if (combat != null)
+            combat.StartAttackLoop();
     }
 
 
@@ -139,10 +144,5 @@ public abstract class Hero : MonoBehaviour
         LevelUp();
         return this;
     }
-    // ===============================
-    // 비주얼/스킬
-    // ===============================
-    public abstract void Attack();
-
 
 }
