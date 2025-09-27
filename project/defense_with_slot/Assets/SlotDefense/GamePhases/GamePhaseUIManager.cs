@@ -3,13 +3,6 @@ using System;
 using System.Collections.Generic;
 using UniRx;
 
-public enum GamePhase
-{
-    Main = 0,
-    Battle = 1,
-    Result = 2,
-}
-
 [Serializable]
 public struct PhaseUIEntry
 {
@@ -17,7 +10,7 @@ public struct PhaseUIEntry
     public List<PhaseUI> UIs;
 }
 
-public class UIPhaseManager : SingletonMono<UIPhaseManager>
+public class GamePhaseUIManager : SingletonMono<GamePhaseUIManager>
 {
     [SerializeField] private List<PhaseUIEntry> _entries = new();
 
