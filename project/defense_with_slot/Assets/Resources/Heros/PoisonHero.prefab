@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8692550023618197432}
   - component: {fileID: 515884071051673511}
-  - component: {fileID: 4159938718380067841}
   - component: {fileID: 1724060579817232280}
   - component: {fileID: 32063837288630610}
   m_Layer: 0
@@ -82,19 +81,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4159938718380067841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1845362923257243726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e38fac8f8e5c4acda0c47e928c8421b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _moveSmooth: 20
 --- !u!114 &1724060579817232280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,7 +93,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b85216f773144579876e230da32cece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spriteRenderer: {fileID: 7106834007011169587}
   _level: 1
+  _combat: {fileID: 32063837288630610}
 --- !u!114 &32063837288630610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,14 +109,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackInterval: 5
-  attackRange: 5
-  targetingMode: 2
+  attackRange: 3
+  targetingMode: 0
   impactDamage: 5
   poisonRadius: 2
-  poisonDuration: 8
-  poisonTickDamage: 1
-  poisonTickInterval: 0.01
-  travelTime: 1
+  poisonDuration: 6
+  poisonTickDamage: 4
+  poisonTickInterval: 0.1
+  travelTime: 2
   projectilePrefab: {fileID: 3180124450025084305, guid: b6371bf5d932a439998816ebac3c2262, type: 3}
   poisonColor: {r: 0.6, g: 0.1, b: 0.7, a: 0.8352941}
   effectScale: 2

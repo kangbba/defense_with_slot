@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8692550023618197432}
   - component: {fileID: 515884071051673511}
-  - component: {fileID: 4159938718380067841}
   - component: {fileID: 3093014290459389976}
+  - component: {fileID: 8583350512254399110}
   m_Layer: 0
   m_Name: ElementHero
   m_TagString: Untagged
@@ -81,19 +81,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4159938718380067841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1845362923257243726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e38fac8f8e5c4acda0c47e928c8421b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _moveSmooth: 20
 --- !u!114 &3093014290459389976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,7 +93,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 965d925e268ea4b54892c42fccdfc2bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spriteRenderer: {fileID: 7106834007011169587}
   _level: 1
+  _combat: {fileID: 8583350512254399110}
+--- !u!114 &8583350512254399110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845362923257243726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ac75dde4878d4787a37acbb21e93abd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackInterval: 1
+  attackRange: 5
+  targetingMode: 0
+  orbAmount: 1
 --- !u!1 &2731794226015983847
 GameObject:
   m_ObjectHideFlags: 0
