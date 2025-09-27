@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UniRx;
 
-public class EnemyCountDisplayer : PhaseUI
+public class EnemyCountDisplayer : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _enemyCountText;
 

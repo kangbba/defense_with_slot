@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UniRx;
 
-public class CoinDisplayer : PhaseUI
+public class CoinDisplayer : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _coinText;
 
