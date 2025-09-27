@@ -17,20 +17,28 @@ public enum TargetingMode
 }
 
 [RequireComponent(typeof(Hero))]
+
 public abstract class HeroCombat : MonoBehaviour, IAttackable
 {
     [Header("Combat Settings")]
-    [SerializeField] protected float attackInterval = 1f;   // 공격 간격
-    [SerializeField] protected float attackRange = 5f;      // 사정거리
+    [SerializeField] protected float attackInterval = 1f;
+    [SerializeField] protected float attackRange = 5f;
     [SerializeField] protected TargetingMode targetingMode = TargetingMode.NearestEveryTime;
 
     protected Hero hero;
-    protected Enemy currentTarget; // LockOn 모드 전용
+    protected Enemy currentTarget;
     private CancellationTokenSource _cts;
+
+    private IEnemyProvider _enemyProvider;
 
     protected virtual void Awake()
     {
         hero = GetComponent<Hero>();
+    }
+
+    public void Init(IEnemyProvider provider)
+    {
+        _enemyProvider = provider;
     }
 
     private void OnDisable() => StopAttackLoop();
@@ -67,90 +75,34 @@ public abstract class HeroCombat : MonoBehaviour, IAttackable
                 float sqrDist = (target.transform.position - transform.position).sqrMagnitude;
                 if (sqrDist <= attackRange * attackRange)
                 {
-                    // 🔹 공격 동작이 끝날 때까지 기다림
                     await AttackAsync(target);
                 }
             }
 
-            // 🔹 공격 이후 딜레이
             await UniTask.Delay(TimeSpan.FromSeconds(attackInterval), cancellationToken: token);
         }
     }
 
     protected virtual Enemy SelectTarget()
     {
+        if (_enemyProvider == null) return null;
+
         switch (targetingMode)
         {
             case TargetingMode.NearestEveryTime:
-                return FindNearestEnemy();
+                return _enemyProvider.FindNearest(transform.position, attackRange);
 
             case TargetingMode.LockOnOne:
-                if (currentTarget == null || currentTarget.Hp.Value <= 0)
-                {
-                    currentTarget = FindNearestEnemy();
-                }
-                else
-                {
-                    // 🔹 사정거리 벗어나면 해제 후 다시 찾음
-                    float sqrDist = (currentTarget.transform.position - transform.position).sqrMagnitude;
-                    if (sqrDist > attackRange * attackRange)
-                    {
-                        currentTarget = FindNearestEnemy();
-                    }
-                }
+                currentTarget = _enemyProvider.LockOnOne(transform.position, attackRange, currentTarget);
                 return currentTarget;
 
             case TargetingMode.RandomInRange:
-                return FindRandomEnemyInRange();
+                return _enemyProvider.FindRandomInRange(transform.position, attackRange);
 
             default:
                 return null;
         }
     }
 
-    protected Enemy FindNearestEnemy()
-    {
-        var enemies = EnemyManager.Instance.ActiveEnemies;
-        if (enemies == null || enemies.Count == 0) return null;
-
-        Enemy nearest = null;
-        float minDist = float.MaxValue;
-        Vector3 myPos = transform.position;
-
-        foreach (var e in enemies)
-        {
-            if (e == null || e.Hp.Value <= 0) continue;
-            float dist = (e.transform.position - myPos).sqrMagnitude;
-            if (dist < minDist && dist <= attackRange * attackRange)
-            {
-                minDist = dist;
-                nearest = e;
-            }
-        }
-        return nearest;
-    }
-
-    protected Enemy FindRandomEnemyInRange()
-    {
-        var enemies = EnemyManager.Instance.ActiveEnemies;
-        if (enemies == null || enemies.Count == 0) return null;
-
-        var list = new System.Collections.Generic.List<Enemy>();
-        Vector3 myPos = transform.position;
-
-        foreach (var e in enemies)
-        {
-            if (e == null || e.Hp.Value <= 0) continue;
-            float dist = (e.transform.position - myPos).sqrMagnitude;
-            if (dist <= attackRange * attackRange)
-                list.Add(e);
-        }
-
-        if (list.Count == 0) return null;
-        int idx = UnityEngine.Random.Range(0, list.Count);
-        return list[idx];
-    }
-
-    // 🔹 영웅별로 구현 (즉시형은 CompletedTask 반환, 투척/폭탄형은 travelTime 끝날 때까지 기다림)
     protected abstract UniTask AttackAsync(Enemy target);
 }

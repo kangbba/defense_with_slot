@@ -1,84 +1,52 @@
 using UnityEngine;
 using DG.Tweening;
-using UniRx;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-[RequireComponent(typeof(Draggable))]
 public abstract class Hero : MonoBehaviour
 {
     [Header("Visuals")]
     private SpriteRenderer _spriteRenderer;
 
     [Header("Level Settings")]
-    [SerializeField] private int _level = 1; // private backing field
-    public int Level => _level;              // 외부는 읽기 전용
+    [SerializeField] private int _level = 1;
+    public int Level => _level;
 
     public abstract HeroType Type { get; }
-    private Draggable _draggable;
+
     private Vector2 _baseScale;
-
-    private System.Action<Hero> _onDragStart;
-    private System.Action<Hero, Vector2> _onDragEnd;
-
     private Tween _moveTween;
     private Tween _scaleTween;
 
-    private Vector2 _dragStartPos;
-    private Cell _dragStartCell;
+    // 🔹 Combat을 Hero가 직접 바인딩
+    [SerializeField] private HeroCombat _combat;
+    public HeroCombat Combat => _combat;
 
-    // ===============================
-    // 초기화
-    // ===============================
     private void Awake()
     {
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _spriteRenderer.sortingOrder = RenderOrder.HERO_ORDER;
+        _baseScale = transform.localScale;
+
+        // 인스펙터에 없으면 자동 캐싱
+        if (_combat == null)
+            _combat = GetComponent<HeroCombat>();
+
+        if (_combat == null)
+            Debug.LogWarning($"[Hero] {name} 에 HeroCombat 없음");
     }
-    public void Init(
-        int level,
-        System.Action<Hero> onDragStart,
-        System.Action<Hero, Vector2> onDragEnd)
+
+    // ===============================
+    // 초기화
+    // ===============================
+    public void Init(int level, IEnemyProvider provider)
     {
-        _onDragStart = onDragStart;
-        _onDragEnd   = onDragEnd;
+        SetLevel(level, applyScale: true);
 
-        if (_draggable == null) 
-            _draggable = GetComponent<Draggable>();
-
-        _baseScale = new Vector2(transform.localScale.x, transform.localScale.y);
-
-        SetLevel(level, applyScale:true);
-
-        // 드래그 시작
-        _draggable.IsDragging
-            .DistinctUntilChanged()
-            .Where(on => on)
-            .Subscribe(_ =>
-            {
-                var bf = FieldManager.Instance?.CurrentField;
-                _dragStartPos  = new Vector2(transform.position.x, transform.position.y);
-                _dragStartCell = bf?.GetHeroCell(this);
-
-                _onDragStart?.Invoke(this);
-            })
-            .AddTo(this);
-
-        // 드래그 끝
-        _draggable.IsDragging
-            .DistinctUntilChanged()
-            .Where(on => !on)
-            .WithLatestFrom(_draggable.CurrentWorldPos, (_, pos) => pos)
-            .Subscribe(pos => _onDragEnd?.Invoke(this, pos))
-            .AddTo(this);
-
-        // ✅ 전투 루프 시작
-        var combat = GetComponent<HeroCombat>();
-        if (combat != null)
-            combat.StartAttackLoop();
+        if (_combat != null && provider != null)
+        {
+            _combat.Init(provider);
+            _combat.StartAttackLoop();
+        }
     }
-
 
     // ===============================
     // 이동
@@ -89,13 +57,9 @@ public abstract class Hero : MonoBehaviour
         _moveTween = transform.DOMove(new Vector3(to.x, to.y, 0f), duration).SetEase(Ease.OutQuad);
     }
 
-    public void RevertToStart(float duration = 0.15f)
+    public void RevertTo(Vector2 pos, float duration = 0.15f)
     {
-        Vector2 back = _dragStartCell != null 
-            ? (Vector2)_dragStartCell.WorldPosition 
-            : _dragStartPos;
-
-        SnapTo(back, duration);
+        SnapTo(pos, duration);
     }
 
     // ===============================
@@ -127,22 +91,20 @@ public abstract class Hero : MonoBehaviour
             .SetEase(Ease.OutBack);
     }
 
-  // ===============================
-// 병합 로직
+    // ===============================
+    // 병합 로직
     // ===============================
     public bool CanMergeWith(Hero other)
     {
         if (other == null) return false;
         if (Type != other.Type) return false;
-        return _level == other._level;
+        return _level == other.Level;
     }
 
     public Hero MergeWith(Hero other)
     {
         if (!CanMergeWith(other)) return this;
-
         LevelUp();
         return this;
     }
-
 }

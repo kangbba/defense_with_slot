@@ -1,45 +1,29 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum HeroType
-{
-    Fire,      // 범위 폭발
-    Element,     // 돈 생산
-    Lightning, // 단일 강공
-    Ice,       // 관통
-    Poison,    // 범위 중독
-    Rock       // 빠른 공격
-}
-
 public class HeroManager : SingletonMono<HeroManager>
 {
-    // ===============================
-    // Constants
-    // ===============================
     private const string HERO_PREFAB_PATH = "Heros/{0}Hero"; 
-    // e.g. Resources/Heros/FireHero.prefab
-
-    // ===============================
-    // Prefab Cache
-    // ===============================
-    private readonly Dictionary<HeroType, Hero> _heroPrefabs = new Dictionary<HeroType, Hero>();
+    private readonly Dictionary<HeroType, Hero> _heroPrefabs = new();
 
     [Header("Hierarchy")]
-    [SerializeField] private Transform _root; // 히어로 부모 (없으면 자동 생성)
+    [SerializeField] private Transform _root;
 
     protected override bool UseDontDestroyOnLoad => false;
-   
+
     protected override void Awake()
     {
-        base.Awake(); 
+        base.Awake();
         EnsureRoot();
-        PreloadHeroPrefabs(); 
+        PreloadHeroPrefabs();
     }
 
+    // ======================================
+    // 초기화 / 프리팹 캐싱
+    // ======================================
     private void EnsureRoot()
     {
         if (_root != null) return;
-
         var go = new GameObject("Heroes");
         _root = go.transform;
         _root.SetParent(transform, false);
@@ -58,32 +42,15 @@ public class HeroManager : SingletonMono<HeroManager>
                 Debug.LogError($"[HeroManager] Hero prefab not found at {path}");
                 continue;
             }
-
             _heroPrefabs[type] = prefab;
         }
 
         Debug.Log($"[HeroManager] {_heroPrefabs.Count} hero prefabs loaded.");
     }
 
-    // ===============================
-    // Public API
-    // ===============================
-    public void MakeRandomHeroOnRandomCell()
-    {
-        var field = FieldManager.Instance.CurrentField;
-        if (field == null) return;
-
-        var cell = field.GetRandomEmptyCell();
-        if (cell == null)
-        {
-            Debug.LogWarning("[HeroManager] 빈 셀이 없음");
-            return;
-        }
-
-        HeroType heroType = GetRandomHeroType();
-        SpawnHeroAtCell(heroType, 1, cell);
-    }
-
+    // ======================================
+    // 생성 관련
+    // ======================================
     public Hero SpawnHeroAtCell(HeroType type, int level, Cell cell)
     {
         if (!_heroPrefabs.TryGetValue(type, out var prefab))
@@ -92,88 +59,55 @@ public class HeroManager : SingletonMono<HeroManager>
             return null;
         }
 
+        var bf = FieldManager.Instance.CurBattleField;
+        if (cell == null || bf == null)
+        {
+            Debug.LogWarning("[HeroManager] Target cell or BattleField is null");
+            return null;
+        }
+
         EnsureRoot();
 
-        Vector2 pos2 = cell.WorldPosition;
         var hero = Instantiate(
-            prefab, 
-            new Vector3(pos2.x, pos2.y, 0f), 
+            prefab,
+            new Vector3(cell.WorldPosition.x, cell.WorldPosition.y, 0f),
             Quaternion.identity,
-            _root // ✅ 부모 지정
+            _root
         );
 
-        hero.Init(
-            level,
-            onDragStart: h => { },
-            onDragEnd:   OnHeroDragEnd
-        );
+        // 🔹 전투 가능하도록 IEnemyProvider까지 같이 주입
+        hero.Init(level, bf);
 
-        FieldManager.Instance.CurrentField.Occupy(hero, cell);
-        hero.SnapTo(cell.WorldPosition, 0f);
+        // 전장에 등록
+        bf.Occupy(hero, cell);
 
         Debug.Log($"[HeroManager] {type}Hero 생성 at {cell.GridPosition}, level {level}");
         return hero;
     }
 
-    public void OnHeroDragEnd(Hero hero, Vector2 dropPos)
+    public Hero MakeRandomHeroOnRandomCell()
     {
-        var bf = FieldManager.Instance?.CurrentField;
-        if (bf == null) return;
+        var bf = FieldManager.Instance.CurBattleField;
+        if (bf == null) return null;
 
-        var targetCell = bf.GetClosestCell(dropPos);
-        if (targetCell == null)
-        {
-            hero.RevertToStart();
-            return;
-        }
+        var cell = bf.GetRandomEmptyCell();
+        if (cell == null) return null;
 
-        var prevCell = bf.GetHeroCell(hero);
-        var occupant = bf.GetOccupant(targetCell);
-
-        if (prevCell == targetCell)
-        {
-            hero.SnapTo(targetCell.WorldPosition);
-            Debug.Log("[HeroManager] SameCell 정렬");
-            return;
-        }
-
-        if (occupant != null && occupant != hero)
-        {
-            if (occupant.Type == hero.Type)
-            {
-                hero.RevertToStart();
-                Debug.Log($"[HeroManager] Merge candidate {hero.Type}");
-                MergeManager.Instance.TryMerge(hero, occupant);
-            }
-            else
-            {
-                hero.RevertToStart();
-                Debug.Log($"[HeroManager] Blocked by {occupant.Type}");
-            }
-            return;
-        }
-
-        if (bf.Occupy(hero, targetCell))
-        {
-            hero.SnapTo(targetCell.WorldPosition);
-            Debug.Log($"[HeroManager] {hero.Type} placed at {targetCell.GridPosition}");
-        }
-        else
-        {
-            hero.RevertToStart();
-            Debug.Log("[HeroManager] Occupy 실패. Revert");
-        }
+        var randomType = GetRandomHeroType();
+        return SpawnHeroAtCell(randomType, 1, cell);
     }
 
-    private HeroType GetRandomHeroType()
+    public HeroType GetRandomHeroType()
     {
         var values = (HeroType[])System.Enum.GetValues(typeof(HeroType));
         return values[Random.Range(0, values.Length)];
     }
 
-    protected override void Release() 
-    { 
-        // 선택: 남은 히어로들 정리
+    // ======================================
+    // 정리
+    // ======================================
+    protected override void Release()
+    {
         if (_root != null)
         {
             for (int i = _root.childCount - 1; i >= 0; i--)

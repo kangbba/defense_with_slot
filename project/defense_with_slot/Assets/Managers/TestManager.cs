@@ -39,7 +39,7 @@ public class TestManager : MonoBehaviour
 
     private void SpawnSpecificHero(HeroType type)
     {
-        var field = FieldManager.Instance.CurrentField;
+        var field = FieldManager.Instance.CurBattleField;
         if (field == null)
         {
             Debug.LogError("[TestManager] 필드가 없음");
@@ -59,7 +59,8 @@ public class TestManager : MonoBehaviour
 
     private void OnSpawnRandomHeroClicked()
     {
-        HeroManager.Instance.MakeRandomHeroOnRandomCell(); 
-        Debug.Log("[TestManager] 랜덤 Hero 스폰 요청");
+        HeroManager.Instance.MakeRandomHeroOnRandomCell();
     }
+
+
 }

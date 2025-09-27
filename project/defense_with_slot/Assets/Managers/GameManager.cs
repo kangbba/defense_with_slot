@@ -11,8 +11,8 @@ public class GameManager : SingletonMono<GameManager>
     private void Start()
     {
         // 1) 전장 생성
-        FieldManager.Instance.MakeBattleField();
-        EnemyManager.Instance.StartEnemySpawn();
+        var bf = FieldManager.Instance.MakeBattleField();
+        bf.StartEnemySpawn();
     }
 
 }

@@ -11,7 +11,7 @@ public class MergeManager : SingletonMono<MergeManager>
         if (hero.Type != other.Type) return;
         if (hero.Level != other.Level) return;
 
-        var bf = FieldManager.Instance?.CurrentField;
+        var bf = FieldManager.Instance?.CurBattleField;
         if (bf == null) return;
 
         var cell = bf.GetHeroCell(other);
@@ -21,8 +21,8 @@ public class MergeManager : SingletonMono<MergeManager>
         HeroType type = hero.Type;
 
         // 안전하게 제거
-        FieldManager.Instance.CurrentField.RemoveHero(hero);
-        FieldManager.Instance.CurrentField.RemoveHero(other);
+        FieldManager.Instance.CurBattleField.RemoveHero(hero);
+        FieldManager.Instance.CurBattleField.RemoveHero(other);
 
         // 새 히어로 배치
         HeroManager.Instance.SpawnHeroAtCell(type, newLevel, cell);
